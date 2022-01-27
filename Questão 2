@@ -1,0 +1,17 @@
+#############  Questao 2 - Bairros em ordem crescente de faturamento médio dos listings  ##########
+
+import pandas as pd
+
+from pandas.core.tools.datetimes import to_datetime
+
+details = pd.read_csv('desafio_details.csv')
+prices = pd.read_csv('desafio_priceav.csv')
+
+price_details = prices.merge(details,on = 'airbnb_listing_id') 
+price_details = price_details[price_details['occupied'] == 1]  
+price_details['Qnty_Distric'] = 1         
+price_details = pd.pivot_table(price_details, values = ['price_string','Qnty_Distric'], index = 'suburb', aggfunc = {'price_string': np.sum, 'Qnty_Distric': np.sum}).astype(int).reset_index()
+price_details['Faturamento_Listings_Mean'] = (price_details['price_string']/price_details['Qnty_Distric']).astype(int) 
+price_details = pd.pivot_table(price_details, values = ['Faturamento_Listings_Mean'], index = 'suburb').reset_index()
+price_details = price_details.sort_values(by = 'Faturamento_Listings_Mean')
+price_details
