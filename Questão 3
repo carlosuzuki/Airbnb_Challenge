@@ -1,0 +1,50 @@
+########  Questao 3 - Existem correlações entre as características de um anúncio e seu faturamento? ##########
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import datetime as dt
+import numpy as np
+
+from pandas.core.tools.datetimes import to_datetime
+
+details = pd.read_csv('desafio_details.csv')
+prices = pd.read_csv('desafio_priceav.csv')
+
+price_details = prices.merge(details,on = 'airbnb_listing_id') 
+price_details = price_details[price_details['occupied'] == 1]  
+price_details['Qnty_Distric'] = 1         
+price_details_aux1 = price_details
+price_details = pd.pivot_table(price_details, values = ['price_string','Qnty_Distric'], index = 'suburb', aggfunc = {'price_string': np.sum, 'Qnty_Distric': np.sum}).astype(int).reset_index()
+price_details['Faturamento_Listings_Mean'] = (price_details['price_string']/price_details['Qnty_Distric']).astype(int)
+
+price_details = price_details.sort_values(by = 'suburb')
+plt.bar(price_details['suburb'],price_details['Faturamento_Listings_Mean'])
+plt.title("Faturamento médio por bairro")
+plt.show()
+
+price_details = price_details.sort_values(by = 'suburb')
+plt.bar(price_details['suburb'],price_details['Qnty_Distric'])
+plt.title("Qnt. moradias por bairro")
+plt.show()
+
+price_details_aux2 = price_details_aux1
+price_details_aux1 = price_details_aux1[price_details_aux1['is_superhost'] == 1]  
+price_details_aux1 = pd.pivot_table(price_details_aux1, values = ['is_superhost'],index= 'suburb', aggfunc = {'is_superhost': np.sum}).astype(int).reset_index()
+price_details_aux1 = price_details_aux1.sort_values(by = 'suburb')
+plt.bar(price_details_aux1['suburb'],price_details_aux1['is_superhost'])
+plt.title("Superhost por bairro")
+plt.show()
+
+price_details_aux3 = price_details_aux2
+price_details_aux2['number_of_rooms'] = (price_details_aux2['number_of_bedrooms'] + price_details_aux2['number_of_bathrooms'])
+price_details_aux2 =  pd.pivot_table(price_details_aux2, values = ['number_of_rooms'],index= 'suburb' , aggfunc = { 'number_of_rooms': np.sum}).astype(int).reset_index()
+price_details_aux2 = price_details_aux2.sort_values(by = 'suburb')
+plt.bar(price_details_aux2['suburb'],price_details_aux2['number_of_rooms'])
+plt.title("quant quartos por bairro")
+plt.show()
+
+price_details_aux3 =  pd.pivot_table(price_details_aux3, values = ['star_rating'],index= 'suburb' , aggfunc = { 'star_rating': np.sum}).astype(int).reset_index()
+price_details_aux3 = price_details_aux3.sort_values(by = 'suburb')
+plt.bar(price_details_aux3['suburb'],price_details_aux3['star_rating'])
+plt.title("quant estrelas por bairro")
+plt.show()
