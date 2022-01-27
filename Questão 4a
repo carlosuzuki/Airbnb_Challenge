@@ -1,0 +1,25 @@
+########  Questao 4a -  Esse número é maior ou menor para finais de semana?  ##########
+
+import pandas as pd
+import datetime as dt
+import numpy as np
+
+from pandas.core.tools.datetimes import to_datetime
+
+details = pd.read_csv('desafio_details.csv')
+prices = pd.read_csv('desafio_priceav.csv')
+
+price_details = prices.merge(details,on = 'airbnb_listing_id') 
+price_details = price_details[price_details['occupied'] == 1]  
+price_details['Qnty_Distric'] = 1         
+price_details ['booked_on'] = pd.to_datetime(price_details['booked_on'])
+price_details ['date'] = pd.to_datetime(price_details['date'])
+price_details['antecedência'] = (price_details.date - price_details.booked_on).dt.days
+price_details['weekday'] = price_details['date'].dt.day_name()
+weekend = ['Saturday','Sunday']
+price_details = price_details4[price_details['weekday'].isin(weekend)]
+price_details =  pd.pivot_table(price_details, values = ['Qnty_Distric','antecedência'],index= 'occupied' , aggfunc = {'Qnty_Distric': np.sum, 'antecedência': np.sum}).astype(int).reset_index()
+price_details['antecedência média weekend'] = round((price_details['antecedência']/price_details['Qnty_Distric']).astype(float) ,2 )
+price_details['antecedência média weekend'] #37,13 dias.
+
+#Resposta: O tempo médio de antecedencia da reserva é menor para os finais de semana mas não significativamente.   
